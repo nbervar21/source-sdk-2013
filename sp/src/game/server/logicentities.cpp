@@ -844,6 +844,29 @@ void CC_Global_Set( const CCommand &args )
 
 static ConCommand global_set( "global_set", CC_Global_Set, "global_set <globalname> <state>: Sets the state of the given env_global (0 = OFF, 1 = ON, 2 = DEAD).", FCVAR_CHEAT );
 
+void CC_Global_Equals(const CCommand &args)
+{
+	const char *szGlobal = args[1];
+	const char *szCompareTo = args[2];
+	const char *szSuccessCmd = args[3];
+
+	if (szGlobal == NULL || szCompareTo == NULL || szSuccessCmd == NULL)
+	{
+		Msg("Usage: global_equals <globalname> <state> <command> - Tests if global contains state, then runs command if successful.");
+		return;
+	}
+
+	int iState = atoi(szCompareTo);
+	int iIndex = GlobalEntity)GetIndex(szGlobal);
+	int iRet = GlobalEntity_GetState(iIndex);
+
+	if (iRet == iState)
+	{
+		engine->ServerCommand(szSuccessCmd);
+	}
+}
+
+static ConCommand global_equals("global_equals", CC_Global_Equals, "Usage: global_equals <globalname> <state> <command> - Tests if global contains state, then runs command if successful.", FCVAR_CHEAT)
 
 //-----------------------------------------------------------------------------
 // Purpose: Holds a global state that can be queried by other entities to change

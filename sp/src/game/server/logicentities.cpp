@@ -7,6 +7,7 @@
 #include "cbase.h"
 #include "entityinput.h"
 #include "entityoutput.h"
+#include "entitylist.h"
 #include "eventqueue.h"
 #include "mathlib/mathlib.h"
 #include "globalstate.h"
@@ -843,6 +844,40 @@ void CC_Global_Set( const CCommand &args )
 }
 
 static ConCommand global_set( "global_set", CC_Global_Set, "global_set <global> <state> - Sets the state of the given env_global (0 = OFF, 1 = ON, 2 = DEAD).", FCVAR_CHEAT );
+
+void CC_Global_SetCounter(const CCommand &args)
+{
+	const char *szGlobal = args[1];
+	const char *szCounter = args[2];
+
+	if (szGlobal == NULL || szCounter == NULL)
+	{
+		Msg("Usage: global_setcounter <global> <count>");
+		return;
+	}
+
+	int iCounter = atoi(szCounter);
+	GlobalEntity_SetCounter(szGlobal, iCounter);
+}
+
+static ConCommand global_setcounter("global_setcount", CC_Global_SetCounter, "global_setcounter <global> <count>", FCVAR_CHEAT);
+
+void CC_Global_StoreValue(const CCommand &args)
+{
+	const char *szGlobal = args[1];
+	const char *szTargetName = args[2];
+	const char *szKeyName = args[3];
+
+	if (szGlobal == NULL || szTargetName == NULL || szKeyName == NULL)
+	{
+		Msg("Usage: global_storevalue <global> <entity> <keyvalue> - Store entity keyvalue in global counter");
+		return;
+	}
+
+	pTarget = gEntList.FindEntityByName(NULL, szTargetName);
+
+	// TODO
+}
 
 void CC_Global_Equals(const CCommand &args)
 {

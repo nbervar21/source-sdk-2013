@@ -857,7 +857,7 @@ void CC_Global_Equals(const CCommand &args)
 	}
 
 	int iState = atoi(szCompareTo);
-	int iRet = GlobalEntity_GetState(szGlobal);
+	int iRet = GlobalEntity_GetCounter(szGlobal);
 
 	if (iRet == iState)
 	{
@@ -879,8 +879,8 @@ void CC_Global_Compare(const CCommand &args)
 		return;
 	}
 
-	int iVal1 = GlobalEntity_GetState(szGlobal1);
-	int iVal2 = GlobalEntity_GetState(szGlobal2);
+	int iVal1 = GlobalEntity_GetCounter(szGlobal1);
+	int iVal2 = GlobalEntity_GetCounter(szGlobal2);
 
 	if (iVal1 == iVal2)
 	{

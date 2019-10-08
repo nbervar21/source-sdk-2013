@@ -824,7 +824,7 @@ void CC_Global_Set( const CCommand &args )
 
 	if ( szGlobal == NULL || szState == NULL )
 	{
-		Msg( "Usage: global_set <globalname> <state>: Sets the state of the given env_global (0 = OFF, 1 = ON, 2 = DEAD).\n" );
+		Msg( "Usage: global_set <global> <state> - Sets the state of the given env_global (0 = OFF, 1 = ON, 2 = DEAD).\n" );
 		return;
 	}
 
@@ -842,7 +842,7 @@ void CC_Global_Set( const CCommand &args )
 	}
 }
 
-static ConCommand global_set( "global_set", CC_Global_Set, "global_set <globalname> <state>: Sets the state of the given env_global (0 = OFF, 1 = ON, 2 = DEAD).", FCVAR_CHEAT );
+static ConCommand global_set( "global_set", CC_Global_Set, "global_set <global> <state> - Sets the state of the given env_global (0 = OFF, 1 = ON, 2 = DEAD).", FCVAR_CHEAT );
 
 void CC_Global_Equals(const CCommand &args)
 {
@@ -852,22 +852,44 @@ void CC_Global_Equals(const CCommand &args)
 
 	if (szGlobal == NULL || szCompareTo == NULL || szSuccessCmd == NULL)
 	{
-		Msg("Usage: global_equals <globalname> <state> <command> - Tests if global contains state, then runs command if successful.");
+		Msg("Usage: global_equals <global> <state> <command> - Tests if global contains state, then runs command if successful.");
 		return;
 	}
 
 	int iState = atoi(szCompareTo);
-	int iIndex = GlobalEntity)GetIndex(szGlobal);
-	int iRet = GlobalEntity_GetState(iIndex);
+	int iRet = GlobalEntity_GetState(szGlobal);
 
 	if (iRet == iState)
 	{
-		engine->ServerCommand(szSuccessCmd);
+		engine->ServerCommand(strcat(szSuccessCmd, "\n"));
 	}
 }
 
-static ConCommand global_equals("global_equals", CC_Global_Equals, "Usage: global_equals <globalname> <state> <command> - Tests if global contains state, then runs command if successful.", FCVAR_CHEAT)
+static ConCommand global_equals("global_equals", CC_Global_Equals, "Usage: global_equals <global> <state> <command> - Tests if global contains state, then runs command if successful.", FCVAR_CHEAT);
 
+void CC_Global_Compare(const CCommand &args)
+{
+	const char *szGlobal1 = args[1];
+	const char *szGlobal2 = args[2];
+	const char *szSuccessCmd = args[3];
+
+	if (szGlobal1 == NULL || szGlobal2 == NULL || szSuccessCmd == NULL)
+	{
+		Msg("Usage: global_compare <global #1> <global #2> <command> - Tests if the globals hold the same values, then runs command if successful", FCVAR_CHEAT);
+		return;
+	}
+
+	int iVal1 = GlobalEntity_GetState(szGlobal1);
+	int iVal2 = GlobalEntity_GetState(szGlobal2);
+
+	if (iVal1 == iVal2)
+	{
+		engine->ServerCommand(strcat(szSuccessCmd, "\n"));
+	}
+}
+
+static ConCommand global_comapre("global_compare", CC_Global_Compare, "Usage: global_compare <global #1> <global #2> <command> - Tests if the globals hold the same values, then runs command if successful", FCVAR_CHEAT);
+	
 //-----------------------------------------------------------------------------
 // Purpose: Holds a global state that can be queried by other entities to change
 //			their behavior, such as "predistaster".

@@ -7377,6 +7377,66 @@ void CC_Ent_Create( const CCommand& args )
 }
 static ConCommand ent_create("ent_create", CC_Ent_Create, "Creates an entity of the given type where the player is looking.  Additional parameters can be passed in in the form: ent_create <entity name> <param 1 name> <param 1> <param 2 name> <param 2>...<param N name> <param N>", FCVAR_GAMEDLL | FCVAR_CHEAT);
 
+void CC_Ent_CreateAtPos( const CCommand& args )
+{
+	MDLCACHE_CRITICAL_SECTION();
+
+	CBasePlayer *pPlayer = UTIL_GetCommandClient();
+	if (!pPlayer)
+	{
+		return;
+	}
+
+	// Don't allow regular users to create point_servercommand entities for the same reason as blocking ent_fire
+	if ( !Q_stricmp( args[1], "point_servercommand" ) )
+	{
+		if ( engine->IsDedicatedServer() )
+		{
+			// We allow people with disabled autokick to do it, because they already have rcon.
+			if ( pPlayer->IsAutoKickDisabled() == false )
+				return;
+		}
+		else if ( gpGlobals->maxClients > 1 )
+		{
+			// On listen servers with more than 1 player, only allow the host to create point_servercommand.
+			CBasePlayer *pHostPlayer = UTIL_GetListenServerHost();
+			if ( pPlayer != pHostPlayer )
+				return;
+		}
+	}
+
+	bool allowPrecache = CBaseEntity::IsPrecacheAllowed();
+	CBaseEntity::SetAllowPrecache( true );
+
+	// Try to create entity
+	CBaseEntity *entity = dynamic_cast< CBaseEntity * >( CreateEntityByName(args[1]) );
+	if (entity)
+	{
+		entity->Precache();
+
+		// Pass in any additional parameters.
+		for ( int i = 5; i + 1 < args.ArgC(); i += 2 )
+		{
+			const char *pKeyName = args[i];
+			const char *pValue = args[i+1];
+			entity->KeyValue( pKeyName, pValue );
+		}
+
+		DispatchSpawn(entity);
+
+		// Now attempt to drop into the world
+		Vector pos;
+		pos.x = args[2];
+		pos.y = args[3];
+		pos.z = args[4];
+
+		entity->Teleport(&pos, NULL, NULL);
+		entity->Activate();
+	}
+	CBaseEntity::SetAllowPrecache( allowPrecache );
+}
+static ConCommand ent_create_at_pos("ent_create_at_pos", CC_Ent_CreateAtPos, "ent_create_at_pos <class> <x> <y> <z> - Creates an entity of the given type at given position.  Additional parameters can be passed in in the form: ent_create <entity name> <param 1 name> <param 1> <param 2 name> <param 2>...<param N name> <param N>", FCVAR_GAMEDLL | FCVAR_CHEAT);
+
 //------------------------------------------------------------------------------
 // Purpose: Teleport a specified entity to where the player is looking
 //------------------------------------------------------------------------------

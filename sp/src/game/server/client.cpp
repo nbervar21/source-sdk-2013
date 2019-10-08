@@ -1173,15 +1173,15 @@ CON_COMMAND_F( setpos, "Move player to specified origin (must have sv_cheats).",
 
 	if ( args.ArgC() < 3 )
 	{
-		ClientPrint( pPlayer, HUD_PRINTCONSOLE, "Usage:  setpos x y <z optional>\n");
+		ClientPrint( pPlayer, HUD_PRINTCONSOLE, "Usage:  setpos x y <z optional> (Use \"~\" for no change)\n");
 		return;
 	}
 
 	Vector oldorigin = pPlayer->GetAbsOrigin();
 
 	Vector newpos;
-	newpos.x = atof( args[1] );
-	newpos.y = atof( args[2] );
+	newpos.x = args[1][0] == '~' ? oldorigin.x : atof( args[1] );
+	newpos.y = args[2][0] == '~' ? oldorigin.y : atof( args[2] );
 	newpos.z = args.ArgC() == 4 ? atof( args[3] ) : oldorigin.z;
 
 	pPlayer->SetAbsOrigin( newpos );
@@ -1207,15 +1207,15 @@ void CC_setang_f (const CCommand &args)
 
 	if ( args.ArgC() < 3 )
 	{
-		ClientPrint( pPlayer, HUD_PRINTCONSOLE, "Usage:  setang pitch yaw <roll optional>\n");
+		ClientPrint( pPlayer, HUD_PRINTCONSOLE, "Usage:  setang pitch yaw <roll optional> (Use \"~\" for no change)\n");
 		return;
 	}
 
 	QAngle oldang = pPlayer->GetAbsAngles();
 
 	QAngle newang;
-	newang.x = atof( args[1] );
-	newang.y = atof( args[2] );
+	newang.x = args[1][0] == '~' ? oldang.x : atof( args[1] );
+	newang.y = args[2][0] == '~' ? oldang.y : atof( args[2] );
 	newang.z = args.ArgC() == 4 ? atof( args[3] ) : oldang.z;
 
 	pPlayer->SnapEyeAngles( newang );

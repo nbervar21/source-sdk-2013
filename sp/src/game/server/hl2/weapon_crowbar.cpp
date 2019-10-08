@@ -22,8 +22,13 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-ConVar    sk_plr_dmg_crowbar		( "sk_plr_dmg_crowbar","0");
-ConVar    sk_npc_dmg_crowbar		( "sk_npc_dmg_crowbar","0");
+ConVar sk_plr_dmg_crowbar("sk_plr_dmg_crowbar", "0");
+ConVar sk_npc_dmg_crowbar("sk_npc_dmg_crowbar", "0");
+ConVar sk_crowbar_viewpunch_x_min("sk_crowbar_viewpunch_x_min", "1.0");
+ConVar sk_crowbar_viewpunch_x_max("sk_crowbar_viewpunch_x_max", "2.0");
+ConVar sk_crowbar_viewpunch_y_min("sk_crowbar_viewpunch_y_min", "-2.0");
+ConVar sk_crowbar_viewpunch_y_max("sk_crowbar_viewpunch_y_max", "-1.0");
+ConVar sk_crowbar_range("sk_crowbar_range", "50");
 
 //-----------------------------------------------------------------------------
 // CWeaponCrowbar
@@ -78,8 +83,8 @@ void CWeaponCrowbar::AddViewKick( void )
 
 	QAngle punchAng;
 
-	punchAng.x = random->RandomFloat( 1.0f, 2.0f );
-	punchAng.y = random->RandomFloat( -2.0f, -1.0f );
+	punchAng.x = random->RandomFloat( sk_crowbar_viewpunch_x_min.GetFloat(), sk_crowbar_viewpunch_x_max.GetFloat() );
+	punchAng.y = random->RandomFloat( sk_crowbar_viewpunch_y_min.GetFloat(), sk_crowbar_viewpunch_y_max.GetFloat() );
 	punchAng.z = 0.0f;
 	
 	pPlayer->ViewPunch( punchAng ); 
@@ -163,7 +168,7 @@ void CWeaponCrowbar::HandleAnimEventMeleeHit( animevent_t *pEvent, CBaseCombatCh
 	}
 
 	Vector vecEnd;
-	VectorMA( pOperator->Weapon_ShootPosition(), 50, vecDirection, vecEnd );
+	VectorMA( pOperator->Weapon_ShootPosition(), sk_crowbar_range.GetInt(), vecDirection, vecEnd );
 	CBaseEntity *pHurt = pOperator->CheckTraceHullAttack( pOperator->Weapon_ShootPosition(), vecEnd, 
 		Vector(-16,-16,-16), Vector(36,36,36), sk_npc_dmg_crowbar.GetFloat(), DMG_CLUB, 0.75 );
 	
